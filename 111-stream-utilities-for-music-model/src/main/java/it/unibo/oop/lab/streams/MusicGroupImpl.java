@@ -1,5 +1,8 @@
 package it.unibo.oop.lab.streams;
 
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,44 +34,68 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public Stream<String> orderedSongNames() {
-        return null;
+        return songs.stream()
+                .map(Song::getSongName).sorted();
     }
 
     @Override
     public Stream<String> albumNames() {
-        return null;
+        return this.albums.keySet().stream();
     }
 
     @Override
     public Stream<String> albumInYear(final int year) {
-        return null;
+        return this.albums.keySet().stream()
+                .filter(i -> this.albums.get(i).
+                equals(year));
     }
 
     @Override
     public int countSongs(final String albumName) {
-        return -1;
+        return (int) this.songs.stream()
+                .map(Song::getAlbumName)
+                .filter(Optional::isPresent)
+                .filter(i -> i.get().equals(albumName))
+                .count();
     }
 
     @Override
     public int countSongsInNoAlbum() {
-        return -1;
+        return (int) this.songs.stream()
+                .map(Song::getAlbumName)
+                .filter(Optional::isEmpty)
+                .count();
     }
 
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
-        return null;
+        return this.songs.stream()
+                .filter(i -> i.getAlbumName().isPresent())
+                .filter(i -> i.getAlbumName().get().equals(albumName))
+                .mapToDouble(Song::getDuration)
+                .average();
     }
 
     @Override
     public Optional<String> longestSong() {
-        return null;
+        return this.songs.stream()
+                .max(Comparator.comparingDouble(Song::getDuration))
+                .map(Song::getSongName);
     }
 
     @Override
     public Optional<String> longestAlbum() {
-        return null;
+        return this.albums.keySet().stream()
+                .max(Comparator.comparingDouble(this::albumDuration));
     }
-
+    private double albumDuration(String album) {
+        return this.songs.stream()
+                .filter(i -> i.getAlbumName().isPresent())
+                .filter(i -> i.getAlbumName().get().equals(album))
+                .mapToDouble(Song::getDuration)
+                .sum();
+    }
+   
     private static final class Song {
 
         private final String songName;
