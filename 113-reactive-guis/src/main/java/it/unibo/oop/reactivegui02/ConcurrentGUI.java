@@ -14,15 +14,20 @@ import javax.swing.SwingUtilities;
  */
 @SuppressWarnings("PMD.AvoidPrintStackTrace")
 public final class ConcurrentGUI extends JFrame {
+
+    private static final long serialVersionUID = 1L;
     private static final double WIDTH_PERC = 0.2;
     private static final double HEIGHT_PERC = 0.1;
-    final JLabel label = new JLabel();
+    private final JLabel label = new JLabel();
 
-    public ConcurrentGUI () {
+    /**
+     * Builds GUI.
+     */
+    public ConcurrentGUI() {
         super();
         final Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize((int) (screenDimension.getWidth() * WIDTH_PERC), (int) (screenDimension.getHeight() * HEIGHT_PERC));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         final JPanel canvas = new JPanel();
         final JButton stop = new JButton("Stop");
@@ -38,7 +43,7 @@ public final class ConcurrentGUI extends JFrame {
         this.setVisible(true);
 
         final Agent agent = new Agent();
-        
+
         stop.addActionListener(a -> {
             up.setEnabled(false);
             down.setEnabled(false);
@@ -50,9 +55,9 @@ public final class ConcurrentGUI extends JFrame {
         new Thread(agent).start();
     }
 
-    private class Agent implements Runnable {
+    private final class Agent implements Runnable {
         private int counter;
-        private volatile boolean stop = false;
+        private volatile boolean stop;
         private volatile boolean up = true;
 
         @Override
