@@ -7,12 +7,12 @@ public class MultiThreadedSumMatrix implements SumMatrix {
 
     private final int nthread;
 
-    public MultiThreadedSumMatrix(int nthread) {
+    public MultiThreadedSumMatrix(final int nthread) {
         this.nthread = nthread;
     }
 
     private static class Worker extends Thread {
-        final double[][] matrix;
+        private final double[][] matrix;
         private final int startpos;
         private final int nelem;
         private long sum;
@@ -25,8 +25,8 @@ public class MultiThreadedSumMatrix implements SumMatrix {
 
         @Override
         public void run() {
-            for(int i = startpos; i < startpos + nelem && i < matrix.length; i++) {
-                for (double d : matrix[i]) {
+            for (int i = startpos; i < startpos + nelem && i < matrix.length; i++) {
+                for (final double d : matrix[i]) {
                     this.sum += d;
                 }
             }
@@ -38,21 +38,21 @@ public class MultiThreadedSumMatrix implements SumMatrix {
     }
 
     @Override
-    public double sum(double[][] matrix) {
+    public double sum(final double[][] matrix) {
         final int size = matrix.length % nthread + matrix.length / nthread;
         final List<Worker> workers = new ArrayList<>(nthread);
 
-        for(int start = 0; start < matrix.length; start += size) {
+        for (int start = 0; start < matrix.length; start += size) {
             workers.add(new Worker(matrix, start, size));
         }
 
-        for (Worker worker : workers) {
+        for (final Worker worker : workers) {
             worker.start();
         }
 
         double sum = 0;
 
-        for (Worker worker : workers) {
+        for (final Worker worker : workers) {
             try {
                 worker.join();
                 sum += worker.getResult();
@@ -62,5 +62,4 @@ public class MultiThreadedSumMatrix implements SumMatrix {
         }
         return sum;
     }
-    
 }
