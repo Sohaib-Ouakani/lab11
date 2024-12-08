@@ -2,12 +2,12 @@ package it.unibo.oop.workers02;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
-public class MultiThreadedSumMatrix implements SumMatrix {
-
+public class MultiThreadedSumMatrixWithStreams implements SumMatrix {
     private final int nthread;
 
-    public MultiThreadedSumMatrix(final int nthread) {
+    public MultiThreadedSumMatrixWithStreams(final int nthread) {
         this.nthread = nthread;
     }
 
@@ -40,26 +40,27 @@ public class MultiThreadedSumMatrix implements SumMatrix {
     @Override
     public double sum(final double[][] matrix) {
         final int size = matrix.length % nthread + matrix.length / nthread;
-        final List<Worker> workers = new ArrayList<>(nthread);
 
-        for (int start = 0; start < matrix.length; start += size) {
-            workers.add(new Worker(matrix, start, size));
-        }
+        return IntStream
+                .iterate(0, start -> start + size)
+                .limit(nthread)
+                .mapToObj(start -> new Worker(matrix, start, size))
+                .peek(Thread::start)
+                .peek(MultiThreadedSumMatrixWithStreams::joinUninterruptibly)
+                .mapToLong(Worker::getResult)
+                .sum();
+    }
 
-        for (final Worker worker : workers) {
-            worker.start();
-        }
-
-        double sum = 0;
-
-        for (final Worker worker : workers) {
+    private static void joinUninterruptibly(final Thread target) {
+        var joined = false;
+        while (!joined) {
             try {
-                worker.join();
-                sum += worker.getResult();
+                target.join();
+                joined = true;
             } catch (InterruptedException e) {
-                throw new IllegalStateException("a thread was interrupted before finishing the task");
+                e.printStackTrace();
             }
         }
-        return sum;
     }
+    
 }
