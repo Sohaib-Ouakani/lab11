@@ -18,6 +18,7 @@ public class MultiThreadedSumMatrixWithStreams implements SumMatrix {
         private long sum;
 
         Worker(final double[][] matrix, final int startpos, final int nelem) {
+            super();
             this.matrix = matrix;
             this.nelem = nelem;
             this.startpos = startpos;
