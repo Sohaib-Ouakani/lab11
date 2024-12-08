@@ -49,9 +49,9 @@ public final class LambdaFilter extends JFrame {
         LINESNUMBER("Count lines", s -> Long.toString(s.lines()
                 .count())),
         ALPHABETICALORDER("In alphabetical order", s ->
-            Arrays.stream(s.split("(\\s|\\p{Punct})+"))
-            .sorted()
-            .collect(Collectors.joining("\n"))),
+                Arrays.stream(s.split("(\\s|\\p{Punct})+"))
+                .sorted()
+                .collect(Collectors.joining("\n"))),
         WORDCOUNTER("Word count", s -> Arrays.stream(s.split("(\\s|\\p{Punct})+"))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
